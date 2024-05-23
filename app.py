@@ -22,6 +22,14 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 
 # TODO: connect to a local postgresql database
+@app.route('/test_db')
+def test_db():
+    try:
+        result = db.session.execute('SELECT 1')
+        return 'Database is connected!' if result else 'Database connection failed.'
+    except Exception as e:
+        app.logger.error(f'Database connection failed: {e}')
+        return f'Database connection failed: {e}'
 
 #----------------------------------------------------------------------------#
 # Models.
