@@ -5,6 +5,7 @@
 import json
 import dateutil.parser
 import babel
+import collections
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
@@ -21,7 +22,14 @@ moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
-# TODO: connect to a local postgresql database
+# To resolve 
+# AttributeError: module 'collections' has no attribute 'Callable'
+# Guided by
+# https://stackoverflow.com/questions/69515086/error-attributeerror-collections-has-no-attribute-callable-using-beautifu
+
+collections.Callable = collections.abc.Callable
+
+# connect to a local postgresql database
 @app.route('/test_db')
 def test_db():
     try:
@@ -48,6 +56,9 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    website_link = db.Column(db.String(500))
+    looking_for_talent = db.Column(db.Boolean, default=False)
+    seeking_description = db.Column(db.String(1000))
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -62,8 +73,24 @@ class Artist(db.Model):
     facebook_link = db.Column(db.String(120))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
+    website = db.Column(db.String(120))
+    seeking_venue = db.Column(db.Boolean, default=False)
+    seeking_description = db.Column(db.String(500))
+    image_link = db.Column(db.String(120))
+    past_shows_count = db.Column(db.Integer)
+    upcoming_shows_count = db.Column(db.Integer)
+    venues = db.relationship('Show', back_populates='artist')
+    venues = db.relationship(
+       'Venue', 
+       secondary='show_table', 
+       backref=db.backref('students', lazy='select')
+    )
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+show_table = db.Table('show_table',
+    db.Column('venue_id', db.Integer, db.ForeignKey('venue.id')),
+    db.Column('artist_id', db.Integer, db.ForeignKey('artist.id'))
+)
 
 #----------------------------------------------------------------------------#
 # Filters.
