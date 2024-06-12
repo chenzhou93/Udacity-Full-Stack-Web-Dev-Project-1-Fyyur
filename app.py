@@ -13,6 +13,7 @@ import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+from flask_migrate import Migrate
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -21,6 +22,7 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 # To resolve 
 # AttributeError: module 'collections' has no attribute 'Callable'
@@ -59,6 +61,7 @@ class Venue(db.Model):
     website_link = db.Column(db.String(500))
     looking_for_talent = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(1000))
+    num_upcoming_shows = db.Column(db.Integer)
 
 class Artist(db.Model):
     __tablename__ = 'Artist'
@@ -79,7 +82,6 @@ class Artist(db.Model):
     image_link = db.Column(db.String(120))
     past_shows_count = db.Column(db.Integer)
     upcoming_shows_count = db.Column(db.Integer)
-    venues = db.relationship('Show', back_populates='artist')
     venues = db.relationship(
        'Venue', 
        secondary='show_table', 
@@ -88,8 +90,8 @@ class Artist(db.Model):
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 show_table = db.Table('show_table',
-    db.Column('venue_id', db.Integer, db.ForeignKey('venue.id')),
-    db.Column('artist_id', db.Integer, db.ForeignKey('artist.id'))
+    db.Column('venue_id', db.Integer, db.ForeignKey(Venue.id)),
+    db.Column('artist_id', db.Integer, db.ForeignKey(Artist.id))
 )
 
 #----------------------------------------------------------------------------#
