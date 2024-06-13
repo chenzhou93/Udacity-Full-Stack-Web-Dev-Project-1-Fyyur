@@ -58,8 +58,8 @@ class Venue(db.Model):
     facebook_link = db.Column(db.String(120))
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
-    website_link = db.Column(db.String(500))
-    looking_for_talent = db.Column(db.Boolean, default=False)
+    website = db.Column(db.String(500))
+    seeking_talent = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(1000))
     num_upcoming_shows = db.Column(db.Integer)
 
@@ -79,7 +79,7 @@ class Artist(db.Model):
     website = db.Column(db.String(120))
     seeking_venue = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(500))
-    image_link = db.Column(db.String(120))
+    image_link = db.Column(db.String(512))
     past_shows_count = db.Column(db.Integer)
     upcoming_shows_count = db.Column(db.Integer)
     venues = db.relationship(
@@ -145,7 +145,7 @@ def venues():
       "num_upcoming_shows": 0,
     }]
   }]
-  return render_template('pages/venues.html', areas=data);
+  return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -243,8 +243,8 @@ def show_venue(venue_id):
     "past_shows_count": 1,
     "upcoming_shows_count": 1,
   }
-  data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
-  return render_template('pages/show_venue.html', venue=data)
+  venue_data = Venue.query.filter_by(id=venue_id).first()
+  return render_template('pages/show_venue.html', venue=venue_data)
 
 #  Create Venue
 #  ----------------------------------------------------------------
