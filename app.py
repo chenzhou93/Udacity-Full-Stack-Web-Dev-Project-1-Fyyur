@@ -45,6 +45,12 @@ def test_db():
 # Models.
 #----------------------------------------------------------------------------#
 
+# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
+show_table = db.Table('show_table',
+    db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
+    db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True)
+)
+
 class Venue(db.Model):
     __tablename__ = 'Venue'
 
@@ -82,17 +88,8 @@ class Artist(db.Model):
     image_link = db.Column(db.String(512))
     past_shows_count = db.Column(db.Integer)
     upcoming_shows_count = db.Column(db.Integer)
-    venues = db.relationship(
-       'Venue', 
-       secondary='show_table', 
-       backref=db.backref('students', lazy='select')
-    )
+    venues = db.relationship('Venue', secondary=show_table, backref=db.backref('artists', lazy='dynamic'))
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-show_table = db.Table('show_table',
-    db.Column('venue_id', db.Integer, db.ForeignKey(Venue.id)),
-    db.Column('artist_id', db.Integer, db.ForeignKey(Artist.id))
-)
 
 #----------------------------------------------------------------------------#
 # Filters.
