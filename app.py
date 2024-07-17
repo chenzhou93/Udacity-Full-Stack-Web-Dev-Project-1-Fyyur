@@ -121,6 +121,37 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+  with app.app_context():
+
+    # Query all venues records from database, with selected fields.
+    venues = Venue.query.with_entities(Venue.id, Venue.name, Venue.city, Venue.state).all()
+    
+    data = [] # The list of final return values
+    row_dict = {} # Temp dict with key: city and values: data entry
+    
+    for venue in venues:
+        # Part of the "venue" list from the returning payload
+        custom_venue_info = {
+           "id": venue.id,
+           "name":venue.name,
+           "num_upcoming_shows": 0
+        }
+
+        # If same city already exists, append custom info into the "venues"
+        if venue.city in row_dict.keys() and row_dict[venue.city] is not None:
+          row_dict[venue.city]["venues"].append(custom_venue_info)
+        else:
+          row_dict[venue.city] = {
+             "city": venue.city,
+             "state": venue.state,
+             "venues": [custom_venue_info]
+          }
+  
+  # Bring all the values to data as the returning payload
+  for key in row_dict.keys():
+     data.append(row_dict[key])
+
+  '''
   data=[{
     "city": "San Francisco",
     "state": "CA",
@@ -142,6 +173,7 @@ def venues():
       "num_upcoming_shows": 0,
     }]
   }]
+  '''
   return render_template('pages/venues.html', areas=data)
 
 @app.route('/venues/search', methods=['POST'])
