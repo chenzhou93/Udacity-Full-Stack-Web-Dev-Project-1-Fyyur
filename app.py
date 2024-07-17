@@ -121,6 +121,8 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
+  
+  # QUESTION: is there a better way to do this? particularly structuring the data from query.
   with app.app_context():
 
     # Query all venues records from database, with selected fields.
