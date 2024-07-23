@@ -183,20 +183,37 @@ def search_venues():
   # TODO: implement search on venues with partial string search. Ensure it is case-insensitive.
   # seach for Hop should return "The Musical Hop".
   # search for "Music" should return "The Musical Hop" and "Park Square Live Music & Coffee"
-  response={
-    "count": 1,
-    "data": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }
+  search_term = request.form.get('search_term', '')
+  search_pattern = f"%{search_term}%"
+
+  venue_outcomes = Venue.query.filter(Venue.name.ilike(search_pattern)).all()
+  print(venue_outcomes)
+
+  response = {}
+  data_list = []
+
+  response["count"] = len(venue_outcomes)
+
+  for venue in venue_outcomes:
+     data_list.append(venue)
+     response["data"] = data_list
+  
+  # response={
+  #   "count": 1,
+  #   "data": [{
+  #     "id": 2,
+  #     "name": "The Dueling Pianos Bar",
+  #     "num_upcoming_shows": 0,
+  #   }]
+  # }
+
   return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
   # shows the venue page with the given venue_id
   # TODO: replace with real venue data from the venues table, using venue_id
+  '''
   data1={
     "id": 1,
     "name": "The Musical Hop",
@@ -274,6 +291,7 @@ def show_venue(venue_id):
     "past_shows_count": 1,
     "upcoming_shows_count": 1,
   }
+  '''
   venue_data = Venue.query.filter_by(id=venue_id).first()
   return render_template('pages/show_venue.html', venue=venue_data)
 
