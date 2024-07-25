@@ -43,3 +43,12 @@ VALUES
 (4, 'Guns N Petals', 'San Francisco', 'CA', '326-123-5000', 'https://www.gunsnpetalsband.com', 'https://www.facebook.com/GunsNPetals', true, 'Looking for shows to perform at in the San Francisco Bay Area!', 'https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80'),
 (5, 'Matt Quevedo', 'New York', 'NY', '300-400-5000', null, 'https://www.facebook.com/mattquevedo923251523', false, null, 'https://images.unsplash.com/photo-1495223153807-b916f75de8c5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80'),
 (6, 'The Wild Sax Band', 'San Francisco', 'CA', '432-325-5432', null, null, false, null, 'https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80');
+
+-- insert show table records
+INSERT INTO "show_table"(id, artist_id, venue_id, start_time)
+VALUES
+(1, 4, 1, '2019-05-21T21:30:00.000Z'),
+(2, 5, 3, '2019-06-15T23:00:00.000Z'),
+(3, 6, 3, '2035-04-01T20:00:00.000Z'),
+(4, 6, 3, '2035-04-08T20:00:00.000Z'),
+(5, 6, 3, '2035-04-15T20:00:00.000Z');

@@ -47,8 +47,10 @@ def test_db():
 
 # TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
 show_table = db.Table('show_table',
-    db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
-    db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True)
+    db.Column('id', db.Integer, primary_key=True, autoincrement=True),
+    db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), nullable=False),
+    db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), nullable=False),
+    db.Column('start_time', db.DateTime, nullable=False)
 )
 
 class Venue(db.Model):
@@ -293,6 +295,10 @@ def show_venue(venue_id):
   }
   '''
   venue_data = Venue.query.filter_by(id=venue_id).first()
+  # upcoming_shows_count = show_table.query.filter(
+  #     show_table.venue_id == venue_id,
+  #     show_table.start_time > datetime.now()
+  # ).count()
   return render_template('pages/show_venue.html', venue=venue_data)
 
 #  Create Venue
