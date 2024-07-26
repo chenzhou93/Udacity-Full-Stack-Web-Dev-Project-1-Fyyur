@@ -9,6 +9,7 @@ import collections
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import select, func
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
@@ -69,8 +70,7 @@ class Venue(db.Model):
     website = db.Column(db.String(500))
     seeking_talent = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(1000))
-    num_upcoming_shows = db.Column(db.Integer)
-
+    
 class Artist(db.Model):
     __tablename__ = 'Artist'
 
@@ -88,8 +88,6 @@ class Artist(db.Model):
     seeking_venue = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(500))
     image_link = db.Column(db.String(512))
-    past_shows_count = db.Column(db.Integer)
-    upcoming_shows_count = db.Column(db.Integer)
     venues = db.relationship('Venue', secondary=show_table, backref=db.backref('artists', lazy='dynamic'))
 
 
@@ -129,25 +127,39 @@ def venues():
 
     # Query all venues records from database, with selected fields.
     venues = Venue.query.with_entities(Venue.id, Venue.name, Venue.city, Venue.state).all()
-    
+  
     data = [] # The list of final return values
     row_dict = {} # Temp dict with key: city and values: data entry
+
+    # Convert rows to dictionaries
+    result_dicts = [dict(row) for row in venues]
     
-    for venue in venues:
+    for result in result_dicts:
         # Part of the "venue" list from the returning payload
+        venue_id = result['id']
+        
+        # Define the query to filter out upcoming shows
+        stmt = select([func.count()]).where(
+            show_table.c.venue_id == venue_id,
+            show_table.c.start_time > datetime.now()
+        )
+
+        # Execute the query
+        upcoming_shows_count = db.session.execute(stmt).scalar()
+
         custom_venue_info = {
-           "id": venue.id,
-           "name":venue.name,
-           "num_upcoming_shows": 0
+           "id": result['id'],
+           "name": result['name'],
+           "num_upcoming_shows": upcoming_shows_count
         }
 
         # If same city already exists, append custom info into the "venues"
-        if venue.city in row_dict.keys() and row_dict[venue.city] is not None:
-          row_dict[venue.city]["venues"].append(custom_venue_info)
+        if result['city'] in row_dict.keys() and row_dict[result['city']] is not None:
+          row_dict[result['city']]["venues"].append(custom_venue_info)
         else:
-          row_dict[venue.city] = {
-             "city": venue.city,
-             "state": venue.state,
+          row_dict[result['city']] = {
+             "city": result['city'],
+             "state": result['state'],
              "venues": [custom_venue_info]
           }
   
